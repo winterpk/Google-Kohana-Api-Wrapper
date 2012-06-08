@@ -2,6 +2,10 @@
 
 This is a wrapper module for googles api libraries
 
+## Google api link
+
+[code.google.com/p/google-api-php-client](http://code.google.com/p/google-api-php-client/)
+
 ## Installation
 
 To use this module copy and paste into the MODPATH of kohana and add to bootstrap.php module loader
