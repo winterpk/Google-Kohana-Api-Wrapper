@@ -25,11 +25,11 @@ class gclient_core
     protected $_gclient;
     
 	/**
-	 * Stores the api library object being called
+	 * Stores the google api service library object being called
 	 *
 	 * @var object
 	 */
-	protected $_api;
+	protected $_service;
 	
 	/**
 	 * Gclient configuration file
@@ -43,7 +43,7 @@ class gclient_core
 	 * 
 	 * @param	string	google api library to call
 	 */
-    protected function __construct($api)
+    protected function __construct($service)
     {
     	if ( ! is_object($this->_gclient))
 		{
@@ -65,7 +65,9 @@ class gclient_core
 			$this->_gclient->setClientId($this->_config->client_id);
 			$this->_gclient->setClientSecret($this->_config->client_secret);
 			$this->_gclient->setDeveloperKey($this->_config->developer_key);
-			$this->_gclient->setRedirectUri($this->_config->redirect_uri);        
+			$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
+			$this->_gclient->setState(Request::$current->uri());
+			$this->_gclient->setApprovalPrompt('auto');  
 			$scopes = '';
 			foreach($this->_config['scope'] as $scope)
 			{
@@ -74,16 +76,16 @@ class gclient_core
 			$this->_gclient->setScopes($scopes);	
 		}
     	
-		if ($api)
+		if ($service)
 		{
 			// attempt to load the api library being called
-			if ( ! $api_file = Kohana::find_file('vendor', 'google/contrib/'.$api))
+			if ( ! $service_file = Kohana::find_file('vendor', 'google/contrib/'.$service))
 			{
-				throw new Gclient_Exception("Google api library not found: " . $api);
+				throw new Gclient_Exception("Google api library not found: " . $service);
 			}
-			require_once($api_file);
-			$api = 'google\\'.$api;			
- 			$this->_api = new $api($this->_gclient);
+			require_once($service_file);
+			$service = 'google\\'.$service;			
+ 			$this->_service = new $service($this->_gclient);
 		}
     }
 
@@ -93,22 +95,33 @@ class gclient_core
 	 * @param	string	gclient api service library name
 	 * @example	$gclient = Gclient::instance('apiCalendarService);
 	 */
-    public static function instance($api = null)
+    public static function instance($service = null)
     {
         if ( ! isset(self::$_instance))
 		{
-			Gclient::$_instance = new Gclient($api);
+			Gclient::$_instance = new Gclient($service);
 		}
         return Gclient::$_instance;
     }
 
 	/**
+	 * Calls the base getUserInfo function to get this users information
+	 * 
+	 * @return	array user information
+	 */
+	public function get_user()
+	{
+		return $this->_gclient->getUserInfo();	
+	}
+	
+	/**
 	 * Returns the api service object ie. apiCalendarService
 	 * 
+	 * @return 
 	 */
-	public function api()
+	public function service()
 	{
-		return $this->_api;
+		return $this->_service;
 	}
 	
 	/**

@@ -112,6 +112,21 @@ class apiClient {
     $this->$service = $this->discoverService($service, $this->services[$service]['discoveryURI']);
     return $this->$service;
   }
+	
+	/**
+	 * MOD, gets the user info from google
+	 * 
+	 * @link	http://stackoverflow.com/questions/8311836/how-to-identify-a-google-oauth2-user
+	 * @return	array 	user information
+	 */
+	public function getUserInfo() 
+	{
+		$req = new apiHttpRequest('https://www.googleapis.com/oauth2/v1/userinfo');
+		// XXX error handling missing, this is just a rough draft
+		$req = $this->auth->sign($req);
+		$resp = $this->io->makeRequest($req)->getResponseBody();
+		return json_decode($resp, 1);  
+	}
 
   /**
    * Add a service

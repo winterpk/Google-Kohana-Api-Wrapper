@@ -29,20 +29,29 @@ class Controller_Gclient extends Kohana_Controller_Template {
 		$this->auto_render = false;
 		if (isset($_GET['code']))
 		{
-			$gtoken = $this->_gclient->authenticate();
-			Session::instance()->set('gtoken', $gtoken);
+			try
+			{
+				$gtoken = $this->_gclient->authenticate();
+				Session::instance()->set('gtoken', $gtoken);
+			} 
+			catch(Exception $e)
+			{
+				echo 'FAILURE!!!';
+			}
 		}
-		
 		if ($gtoken = Session::instance()->get('gtoken'))
 		{
-			$this->_gclient->gclient()->setAccessToken($gtoken);
+			$this->_gclient->setAccessToken($gtoken);
 		}
-		
 		if ($this->_gclient->getAccessToken())
 		{
+			echo $this->_gclient->getAccessToken();
 			// success
+			if ($_GET['state'])
+			{
+				Request::$current->redirect($_GET['state']);
+			}
 			echo "SUCCESS!!!!!";
 		}
-		echo 'in here';
 	}
 } // END
