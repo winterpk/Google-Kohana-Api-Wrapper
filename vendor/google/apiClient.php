@@ -123,10 +123,24 @@ class apiClient {
 	{
 		$req = new apiHttpRequest('https://www.googleapis.com/oauth2/v1/userinfo');
 		// XXX error handling missing, this is just a rough draft
-		$req = $this->auth->sign($req);
-		$resp = $this->io->makeRequest($req)->getResponseBody();
+		$req = self::$auth->sign($req);
+		$resp = self::$io->makeRequest($req)->getResponseBody();
 		return json_decode($resp, 1);  
 	}
+
+	/**
+	 * MOD: validate the access token
+	 * 
+	 * @return string	json encoded string response from Gooogle token validation handler 
+	 */
+	 public function validateToken($token)
+	 {
+	 	$token = json_decode($token);
+	 	$req = new apiHttpRequest('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token='.$token->access_token);
+		$req = self::$auth->sign($req);
+		$resp = self::$io->makeRequest($req)->getResponseBody();
+		return $resp;
+	 }
 
   /**
    * Add a service
@@ -312,7 +326,7 @@ class apiClient {
   public function revokeToken($token = null) {
     self::$auth->revokeToken($token);
   }
-
+	 
   /**
    * Verify an id_token. This method will verify the current id_token, if one
    * isn't provided.

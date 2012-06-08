@@ -115,6 +115,24 @@ class gclient_core
 	}
 	
 	/**
+	 * Validates an access token
+	 * 
+	 * @return mixed	false on failure token infor array on success
+	 */
+	public function validate_token($token)
+	{
+		$return = json_decode($this->_gclient->validateToken($token));
+		if (isset($return->error))
+		{
+			return false;
+		}
+		else
+		{
+			return $return;
+		}
+	}
+	
+	/**
 	 * Returns the api service object ie. apiCalendarService
 	 * 
 	 * @return 
@@ -135,10 +153,27 @@ class gclient_core
 	
 	/**
 	 * Starts the web server application authentication workflow
+	 * This method ties into gclient controller which is passed as the redirect_uri 
+	 * Gclient controller action_index method is responsible for handling the 
+	 * authentication dance between Google server and our your application.
 	 * 
+	 * In short, this method will do everything possible to acquire a valid token
+	 * 
+	 * @example	 
+	 * 			Gclient::instance()->authenticate();
+	 * 			// continue konwing that you have a valid token 
+	 * @return 	true on successfull token validation
 	 */
 	public function authenticate()
 	{
+		if ($gtoken = Session::instance()->get('gtoken'))
+		{
+			$check = $this->validate_token($gtoken);
+			if ($check) // token is valid 
+			{
+				return true;
+			}
+		}
 		Request::$current->redirect(self::$_instance->auth_url());
 	}
 	

@@ -27,6 +27,18 @@ class Controller_Gclient extends Kohana_Controller_Template {
 	public function action_index()
 	{
 		$this->auto_render = false;
+		if ($gtoken = Session::instance()->get('gtoken'))
+		{
+			try
+			{
+				$this->_gclient->setAccessToken($gtoken);
+			} 
+			catch (apiAuthException $e)
+			{
+				Gclient::instance()->authenticate();
+			}
+			
+		}
 		if (isset($_GET['code']))
 		{
 			try
@@ -39,14 +51,9 @@ class Controller_Gclient extends Kohana_Controller_Template {
 				echo 'FAILURE!!!';
 			}
 		}
-		if ($gtoken = Session::instance()->get('gtoken'))
+		
+		if ($valid_token = $this->_gclient->getAccessToken())
 		{
-			$this->_gclient->setAccessToken($gtoken);
-		}
-		if ($this->_gclient->getAccessToken())
-		{
-			echo $this->_gclient->getAccessToken();
-			// success
 			if ($_GET['state'])
 			{
 				Request::$current->redirect($_GET['state']);
