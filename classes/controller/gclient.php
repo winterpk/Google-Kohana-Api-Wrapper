@@ -37,7 +37,6 @@ class Controller_Gclient extends Kohana_Controller_Template {
 			{
 				Gclient::instance()->authenticate();
 			}
-			
 		}
 		if (isset($_GET['code']))
 		{
