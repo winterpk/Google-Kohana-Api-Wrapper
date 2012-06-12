@@ -65,8 +65,8 @@ class gclient_core
 			$this->_gclient->setClientId($this->_config->client_id);
 			$this->_gclient->setClientSecret($this->_config->client_secret);
 			$this->_gclient->setDeveloperKey($this->_config->developer_key);
-			$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
-			$this->_gclient->setState(Request::$current->uri());
+			//$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
+			//$this->_gclient->setState(Request::$current->uri());
 			$this->_gclient->setApprovalPrompt('auto');  
 			$scopes = '';
 			foreach($this->_config['scope'] as $scope)
@@ -75,7 +75,6 @@ class gclient_core
 			}
 			$this->_gclient->setScopes($scopes);	
 		}
-    	
 		if ($service)
 		{
 			// attempt to load the api library being called
@@ -90,13 +89,20 @@ class gclient_core
     }
 
 	/**
-	 * Singleton method loads an object into $_instance, call this function first to use this class
+	 * Singleton method loads Gclient object into $_instance, call this function first to use this class
+	 * If a service string is passed, then it returns a new Gclient object with attached service
 	 * 
 	 * @param	string	gclient api service library name
-	 * @example	$gclient = Gclient::instance('apiCalendarService);
+	 * @return	Object	gclient object
+	 * @example $gclient = Gclient::instance();
+	 * @example	$gcal = Gclient::instance('apiCalendarService);
 	 */
     public static function instance($service = null)
     {
+    	if ($service)
+		{
+			Gclient::$_instance = new Gclient($service);
+		}
         if ( ! isset(self::$_instance))
 		{
 			Gclient::$_instance = new Gclient($service);
@@ -134,11 +140,24 @@ class gclient_core
 	
 	/**
 	 * Returns the api service object ie. apiCalendarService
+	 * If you pass a service name it will act as a setter
 	 * 
-	 * @return 
+	 * @throws	Gclient_Exception on failure to find service library
+	 * @return 	Object Google service object 	
 	 */
-	public function service()
+	public function service($service = null)
 	{
+		// attempt to load the api library being called
+		if ($service)
+		{
+			if ( ! $service_file = Kohana::find_file('vendor', 'google/contrib/'.$service))
+			{
+				throw new Gclient_Exception("Google api library not found: " . $service);
+			}
+			require_once($service_file);
+			$service = 'google\\'.$service;			
+			$this->_service = new $service($this->_gclient);	
+		}
 		return $this->_service;
 	}
 	
