@@ -71,7 +71,7 @@ class URI_Template_Parser {
 
     foreach ($em[1] as $i => $bare_expression) {
       preg_match('/^([\+\;\?\/\.]{1})?(.*)$/', $bare_expression, $lm);
-      $exp = new StdClass();
+      $exp = new \StdClass();
       $exp->expression = $em[0][$i];
       $exp->operator = $lm[1];
       $exp->variable_list = $lm[2];
@@ -79,7 +79,7 @@ class URI_Template_Parser {
       $exp->vars = array();
       foreach ($exp->varspecs as $varspec) {
         preg_match('/^([a-zA-Z0-9_]+)([\*\+]{1})?([\:\^][0-9-]+)?(\=[^,]+)?$/', $varspec, $vm);
-        $var = new StdClass();
+        $var = new \StdClass();
         $var->name = $vm[1];
         $var->modifier = isset($vm[2]) && $vm[2] ? $vm[2] : null;
         $var->modifier = isset($vm[3]) && $vm[3] ? $vm[3] : $var->modifier;

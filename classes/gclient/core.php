@@ -65,9 +65,8 @@ class gclient_core
 			$this->_gclient->setClientId($this->_config->client_id);
 			$this->_gclient->setClientSecret($this->_config->client_secret);
 			$this->_gclient->setDeveloperKey($this->_config->developer_key);
-			//$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
-			//$this->_gclient->setState(Request::$current->uri());
-			$this->_gclient->setApprovalPrompt('auto');  
+			$this->_gclient->setApprovalPrompt('auto'); 
+			$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
 			$scopes = '';
 			foreach($this->_config['scope'] as $scope)
 			{
@@ -110,6 +109,24 @@ class gclient_core
         return Gclient::$_instance;
     }
 
+	/**
+	 * Alias for $this->_gclient->setAccessToken
+	 * 
+	 */
+	public function set_access_token()
+	{
+		return $this->_gclient->setAcessToken();
+	}
+	
+	/**
+	 * Alias for $this->_gclient->getAccessToken()
+	 * 
+	 */
+	public function get_access_token()
+	{
+		return $this->_gclient->getAccessToken();
+	}
+	
 	/**
 	 * Calls the base getUserInfo function to get this users information
 	 * 
