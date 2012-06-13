@@ -8,7 +8,7 @@
 * @copyright      (c) 2012 Winter King
 * @license        http://www.opensource.org/licenses/isc-license.txt
 */
-class gclient_core
+class Gclient_Core
 {
 	/**
 	 * Static variable to store the singleton object
@@ -185,7 +185,33 @@ class gclient_core
     public function gclient()
     {
         return $this->_gclient;
-    }
+	}
+	
+	/**
+	 * Alis for base setState() method
+	 * 
+	 */
+	public function set_state($state)
+	{
+		return $this->_gclient->setState($state);
+	}
+	
+	/**
+	 * setScopes() alias
+	 * 
+	 * @return void
+	 */
+	public function set_scopes($scopes)
+	{
+		if ( ! is_array($scopes))
+		{
+			$scopes = array($scopes);
+		}	
+		foreach($scopes as $scope)
+		{
+			$this->_gclient->setScopes($scope);
+		}
+	}
 	
 	/**
 	 * Alias for base createAuthUrl() method
