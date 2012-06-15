@@ -40,7 +40,7 @@ class apiREST {
     $postBody = $req->getPostBody();
     $url = self::createRequestUri(
         $req->getRestBasePath(), $req->getRestPath(), $req->getParameters());
-
+var_dump($postBody);
     $httpRequest = new apiHttpRequest($url, $req->getHttpMethod(), null, $postBody);
     if ($postBody) {
       $contentTypeHeader = array();

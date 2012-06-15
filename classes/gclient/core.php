@@ -45,35 +45,32 @@ class Gclient_Core
 	 */
     protected function __construct($service)
     {
-    	if ( ! is_object($this->_gclient))
+		if ( ! $this->_config = Kohana::$config->load('gclient'))
 		{
-			if ( ! $this->_config = Kohana::$config->load('gclient'))
-			{
-				throw new Gclient_Exception("No configuration file found");
-			}
-	    	if ($api_client = Kohana::find_file('vendor', 'google/apiClient'))
-			{
-				require_once($api_client);
-			}
-			else 
-			{
-				throw new Gclient_Exception("Google client library not found.");
-			}
-	        // Do class setup
-	        $this->_gclient = new google\apiClient();
-			$this->_gclient->setApplicationName('Qwizzle');
-			$this->_gclient->setClientId($this->_config->client_id);
-			$this->_gclient->setClientSecret($this->_config->client_secret);
-			$this->_gclient->setDeveloperKey($this->_config->developer_key);
-			$this->_gclient->setApprovalPrompt('auto'); 
-			$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
-			$scopes = '';
-			foreach($this->_config['scope'] as $scope)
-			{
-				$scopes .= $scope . ' ';
-			}
-			$this->_gclient->setScopes($scopes);	
+			throw new Gclient_Exception("No configuration file found");
 		}
+    	if ($api_client = Kohana::find_file('vendor', 'google/apiClient'))
+		{
+			require_once($api_client);
+		}
+		else 
+		{
+			throw new Gclient_Exception("Google client library not found.");
+		}
+        // Do class setup
+        $this->_gclient = new google\apiClient();
+		$this->_gclient->setApplicationName('Qwizzle');
+		$this->_gclient->setClientId($this->_config->client_id);
+		$this->_gclient->setClientSecret($this->_config->client_secret);
+		$this->_gclient->setDeveloperKey($this->_config->developer_key);
+		$this->_gclient->setApprovalPrompt('auto'); 
+		$this->_gclient->setRedirectUri($this->_config->redirect_uri);      
+		$scopes = '';
+		foreach($this->_config['scope'] as $scope)
+		{
+			$scopes .= $scope . ' ';
+		}
+		$this->_gclient->setScopes($scopes);
 		if ($service)
 		{
 			// attempt to load the api library being called
@@ -98,16 +95,22 @@ class Gclient_Core
 	 */
     public static function instance($service = null)
     {
-    	if ($service)
+		if ( ! isset(self::$_instance))
 		{
 			Gclient::$_instance = new Gclient($service);
 		}
-        if ( ! isset(self::$_instance))
+		if ($service)
 		{
-			Gclient::$_instance = new Gclient($service);
+			Gclient::$_instance->add_service($service);
+			//Gclient::$_instance = new Gclient($service);
 		}
         return Gclient::$_instance;
     }
+
+	public function add_service($service)
+	{
+		return $this->_gclient->addService($service);
+	}
 
 	/**
 	 * Alias for $this->_gclient->setAccessToken
@@ -161,7 +164,7 @@ class Gclient_Core
 	 * 
 	 * @throws	Gclient_Exception on failure to find service library
 	 * @return 	Object Google service object 	
-	 */
+	 !!!NOT WORKING FOR NOW!!!
 	public function service($service = null)
 	{
 		// attempt to load the api library being called
@@ -177,6 +180,8 @@ class Gclient_Core
 		}
 		return $this->_service;
 	}
+	*/
+	
 	
 	/**
 	 * Returns an object of the base google api library gClient class
